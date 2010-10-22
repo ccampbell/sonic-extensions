@@ -32,7 +32,7 @@ class CurlCached extends Curl
     {
         parent::__construct($url);
         $this->_cache_key = $cache_key;
-        $this->_ttl = $ttl;
+        $this->_ttl = Util::toSeconds($ttl);
     }
 
     /**

@@ -49,6 +49,11 @@ class CurlCached extends Curl
         }
 
         $response = parent::getResponse();
+
+        if (!$response) {
+            return null;
+        }
+
         $cache->set($this->_cache_key, $response, $this->_ttl);
 
         return $response;

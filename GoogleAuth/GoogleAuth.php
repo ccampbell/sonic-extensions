@@ -86,6 +86,10 @@ class GoogleAuth
             $new_params[$param] = $value;
         }
 
+        if (isset($new_params['invalidate_handle'])) {
+            // remove it?
+        }
+
         if ($this->_getParam('assoc_handle') !== $new_params['assoc_handle']) {
             return null;
         }

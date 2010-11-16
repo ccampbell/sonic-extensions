@@ -44,7 +44,7 @@ class GoogleAuth
 
     protected function _requireCurl()
     {
-        if (!class_exists('\Sonic\Curl')) {
+        if (!class_exists('Sonic\Curl')) {
             throw new Exception('GoogleAuth class requires the Sonic Curl extension');
         }
     }

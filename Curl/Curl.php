@@ -142,4 +142,21 @@ class Curl
 
         return $result;
     }
+
+    public function getHeaders()
+    {
+        $this->setOption(CURLOPT_HEADER, 1);
+        $this->setOption(CURLOPT_NOBODY, 1);
+        $response = $this->getResponse();
+
+        $lines = explode("\n", $response);
+        $headers = array();
+        foreach ($lines as $line) {
+            if (strpos($line, ':') === false)
+                continue;
+            $bits = explode(':', $line);
+            $headers[$bits[0]] = trim($bits[1]);
+        }
+        return $headers;
+    }
 }

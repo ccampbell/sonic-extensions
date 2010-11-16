@@ -1,6 +1,6 @@
 <?php
 $config = array(
-    'version' => '1.0',
+    'version' => '1.1',
     'map' => array(
         'Curl.php' => array(
             'file' => 'libs/Sonic/Curl.php'

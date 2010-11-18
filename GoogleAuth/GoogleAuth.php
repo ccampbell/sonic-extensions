@@ -54,7 +54,7 @@ class GoogleAuth
         $this->_requireCurl();
 
         if (self::$_response === null) {
-            $curl = new CurlCached(self::XRD_URI, __METHOD__, '24 hours');
+            $curl = new CurlCached(self::XRD_URI, __METHOD__, '2 hours');
             $params = array(
                 'openid.ns' => self::OPENID_NS,
                 'openid.mode' => 'associate',

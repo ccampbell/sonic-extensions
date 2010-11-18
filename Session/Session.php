@@ -50,6 +50,11 @@ class Session
         session_name($name);
     }
 
+    public function setLifetime($lifetime)
+    {
+        ini_set('session.gc_maxlifetime', Util::toSeconds($lifetime));
+    }
+
     /**
      * sets cookie parameters
      *

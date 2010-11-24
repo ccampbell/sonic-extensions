@@ -39,7 +39,12 @@ class Session
             throw new Exception('you must set at least one server if you are using ' . $handler . ' for session storage');
         }
 
-        ini_set('session.save_path', implode(',', $servers));
+        $this->setSavePath(implode(',', $servers));
+    }
+
+    public function setSavePath($path)
+    {
+        ini_set('session.save_path', $path);
     }
 
     public function setName($name)

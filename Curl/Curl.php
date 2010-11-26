@@ -143,10 +143,12 @@ class Curl
         return $result;
     }
 
-    public function getHeaders()
+    public function getHeaders($options = array())
     {
         $this->setOption(CURLOPT_HEADER, 1);
         $this->setOption(CURLOPT_NOBODY, 1);
+        $this->setOptions($options);
+
         $response = $this->getResponse();
 
         $lines = explode("\n", $response);
@@ -155,6 +157,12 @@ class Curl
             if (strpos($line, ':') === false)
                 continue;
             $bits = explode(':', $line);
+
+            // for urls
+            if (isset($bits[2])) {
+                $bits[1] = $bits[1] . ':' . $bits[2];
+            }
+
             $headers[$bits[0]] = trim($bits[1]);
         }
         return $headers;

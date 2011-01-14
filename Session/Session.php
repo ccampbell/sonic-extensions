@@ -1,17 +1,57 @@
 <?php
 namespace Sonic;
 
+/**
+ * Session
+ *
+ * @category Sonic
+ * @package Session
+ * @author Craig Campbell <iamcraigcampbell@gmail.com>
+ */
 class Session
 {
+    /**
+     * @var string
+     */
     const MEMCACHE = 'memcache';
+
+    /**
+     * @var string
+     */
     const MEMCACHED = 'memcached';
+
+    /**
+     * @var string
+     */
     const FILES = 'files';
 
+    /**
+     * @var Session
+     */
     protected static $_instance;
+
+    /**
+     * @var bool
+     */
     protected $_started = false;
 
+    /**
+     * @var mixed
+     */
+    protected $_lifetime;
+
+    /**
+     * constructor
+     *
+     * @return void
+     */
     private function __construct() {}
 
+    /**
+     * gets instance of Session class
+     *
+     * @return Session
+     */
     public static function getInstance()
     {
         if (self::$_instance === null) {
@@ -20,6 +60,13 @@ class Session
         return self::$_instance;
     }
 
+    /**
+     * sets session handler
+     *
+     * @param string $handler
+     * @param array $servers
+     * @return void
+     */
     public function setHandler($handler = self::FILES, $servers = array())
     {
         if ($handler == self::FILES) {
@@ -36,28 +83,47 @@ class Session
         }
 
         if (count($servers) == 0) {
-            throw new Exception('you must set at least one server if you are using ' . $handler . ' for session storage');
+            throw new \Exception('you must set at least one server if you are using ' . $handler . ' for session storage');
         }
 
         $this->setSavePath(implode(',', $servers));
     }
 
+    /**
+     * sets save path for the session
+     *
+     * @param string $path
+     * @return mixed
+     */
     public function setSavePath($path)
     {
-        ini_set('session.save_path', $path);
+        return ini_set('session.save_path', $path);
     }
 
+    /**
+     * sets the session name
+     *
+     * @param string $name
+     * @return mixed
+     */
     public function setName($name)
     {
         if ($this->_started) {
             return;
         }
-        session_name($name);
+        return session_name($name);
     }
 
+    /**
+     * sets session lifetime
+     *
+     * @param int $lifetime (accepts a string such as '2 weeks' - see Sonic\Util)
+     * @return mixed
+     */
     public function setLifetime($lifetime)
     {
-        ini_set('session.gc_maxlifetime', Util::toSeconds($lifetime));
+        $this->_lifetime = $lifetime;
+        return ini_set('session.gc_maxlifetime', Util::toSeconds($lifetime));
     }
 
     /**
@@ -73,10 +139,16 @@ class Session
      */
     public function setCookieParams($lifetime = 0, $path = '/', $domain = '', $secure = false, $http_only = false)
     {
+        $this->_lifetime = $lifetime;
         $lifetime = Util::toSeconds($lifetime);
         session_set_cookie_params($lifetime, $path, $domain, $secure, $http_only);
     }
 
+    /**
+     * starts the session
+     *
+     * @return void
+     */
     public function start()
     {
         if ($this->_started) {
@@ -85,13 +157,22 @@ class Session
 
         session_start();
 
-        if (mt_rand(1, 10) == 1) {
-            $this->_setCookie('30 days');
+        // if the session has a lifetime that is not the default php does not
+        // reset the session cookie expiration on each request
+        // this resets the cookie on one out of every 10 requests
+        if ($this->_lifetime && mt_rand(1, 10) == 1) {
+            $this->_setCookie($this->_lifetime);
         }
 
         $this->_started = true;
     }
 
+    /**
+     * gets a session variable by name
+     *
+     * @param string $key
+     * @return mixed
+     */
     public function get($key)
     {
         $this->start();
@@ -103,18 +184,36 @@ class Session
         return null;
     }
 
+    /**
+     * sets a session variable
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
     public function set($key, $value)
     {
         $this->start();
         $_SESSION[$key] = $value;
     }
 
+    /**
+     * gets the session id
+     *
+     * @return string
+     */
     public function getId()
     {
         $this->start();
         return session_id();
     }
 
+    /**
+     * sets the session cookie
+     *
+     * @param mixed $expiration
+     * @return void
+     */
     protected function _setCookie($expiration)
     {
         $expiration = Util::toSeconds($expiration);
@@ -130,12 +229,22 @@ class Session
         );
     }
 
+    /**
+     * deletes the session cookie
+     *
+     * @return void
+     */
     protected function _eatCookie()
     {
         $params = session_get_cookie_params();
         setcookie(session_name(), null, 1, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
     }
 
+    /**
+     * destroys the current session
+     *
+     * @return void
+     */
     public function destroy()
     {
         if (!$this->_started) {

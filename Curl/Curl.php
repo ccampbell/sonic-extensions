@@ -143,6 +143,12 @@ class Curl
         return $result;
     }
 
+    /**
+     * gets headers from the response
+     *
+     * @param array $options
+     * @return array
+     */
     public function getHeaders($options = array())
     {
         $this->setOption(CURLOPT_HEADER, 1);

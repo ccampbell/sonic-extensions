@@ -1,12 +1,14 @@
 <?php
-$config = array(
-    'version' => '1.1',
-    'map' => array(
-        'Curl.php' => array(
-            'file' => 'libs/Sonic/Curl.php'
-        ),
-        'CurlCached.php' => array(
-            'file' => 'libs/Sonic/CurlCached.php'
-        )
-    ),
-);
+namespace Sonic\Extension;
+
+/**
+ * Curl Manifest
+ *
+ * @category Sonic
+ * @package Extension
+ * @author Craig Campbell <iamcraigcampbell@gmail.com>
+ */
+class Curl extends Manifest
+{
+    const VERSION = "1.1";
+}

@@ -10,6 +10,9 @@ namespace Sonic;
  */
 class GoogleAuth
 {
+    /**
+     * constants
+     */
     const XRD_URI = 'https://www.google.com/accounts/o8/ud';
     const CLAIMED_ID = 'http://specs.openid.net/auth/2.0/identifier_select';
     const OPENID_NS = 'http://specs.openid.net/auth/2.0';
@@ -19,8 +22,21 @@ class GoogleAuth
     const OPENID_EXT1_TYPE_FIRSTNAME = 'http://axschema.org/namePerson/first';
     const OPENID_EXT1_TYPE_LASTNAME = 'http://axschema.org/namePerson/last';
     const OPENID_EXT1_REQUIRED = 'email,firstname,lastname';
+
+    /**
+     * cached curl response
+     *
+     * @var string
+     */
     protected static $_response;
 
+    /**
+     * gets the url to link to Google Authentication
+     *
+     * @param string $return_to url that Google will redirect back to once authentication is complete
+     *                          this is the url where you will validate the signature
+     * @return string
+     */
     public function getUrl($return_to)
     {
         $params = array(
@@ -42,6 +58,11 @@ class GoogleAuth
         return self::XRD_URI . '?' . http_build_query($params);
     }
 
+    /**
+     * makes sure that Curl extension is installed and loaded
+     *
+     * @return void
+     */
     protected function _requireCurl()
     {
         if (!class_exists('Sonic\Curl')) {
@@ -49,6 +70,12 @@ class GoogleAuth
         }
     }
 
+    /**
+     * allows you to get a parameter related to the open id call
+     *
+     * @param string $param
+     * @return string
+     */
     protected function _getParam($param)
     {
         $this->_requireCurl();
@@ -75,6 +102,12 @@ class GoogleAuth
         return $matches[1];
     }
 
+    /**
+     * generates a signature from the params to check against the openid_sig
+     *
+     * @param string $openid_signed string returned from google of params used for signature
+     * @return string
+     */
     public function generateSignature($openid_signed)
     {
         $params = explode(',', $openid_signed);

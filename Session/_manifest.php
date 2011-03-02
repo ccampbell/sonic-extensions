@@ -1,9 +1,14 @@
 <?php
-$config = array(
-    'version' => '1.0',
-    'map' => array(
-        'Session.php' => array(
-            'file' => 'libs/Sonic/Session.php'
-        ),
-    ),
-);
+namespace Sonic\Extension;
+
+/**
+ * Session Manifest
+ *
+ * @category Sonic
+ * @package Extension
+ * @author Craig Campbell <iamcraigcampbell@gmail.com>
+ */
+class Session extends Manifest
+{
+    const VERSION = "1.0";
+}

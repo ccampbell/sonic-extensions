@@ -10,5 +10,6 @@ namespace Sonic\Extension;
  */
 class Curl extends Manifest
 {
-    const VERSION = "1.1";
+    const VERSION = "1.1.1";
+    protected $_dependencies = array('Cache');
 }

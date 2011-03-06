@@ -1,7 +1,7 @@
 <?php
 namespace Sonic\Cache;
-use Memcache as MC;
 use Sonic\Util;
+use Memcache as MC;
 
 /**
  * Memcache

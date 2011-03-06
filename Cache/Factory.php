@@ -34,7 +34,7 @@ class Factory
         }
 
         if (!self::getConfig()->get('enabled')) {
-            self::$_caches[$pool] = new \Sonic\Cache\Disabled();
+            self::$_caches[$pool] = new Disabled();
             return self::$_caches[$pool];
         }
 

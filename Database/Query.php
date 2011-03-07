@@ -160,6 +160,12 @@ class Query
      */
     public function fetchValue()
     {
+        // if a sort or filter has been applied
+        if ($this->_filter !== null || $this->_sort !== null) {
+            $rows = $this->fetchAll();
+            return count($rows) == 0 ? null : $rows[0];
+        }
+
         if (!$this->_executed) {
             $this->execute();
         }

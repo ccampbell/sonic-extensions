@@ -49,12 +49,12 @@ class Factory
 
         $app = App::getInstance();
         $config = $app->extension('Database')->getConfig();
-        if (!$servers = $config->get('db.' . $schema)) {
+        if (!$servers = $config->get($schema)) {
             throw new Exception('no database found matching schema: ' . $schema);
         }
 
-        $user = $config->get('db.' . $schema . '.user');
-        $password = $config->get('db.' . $schema . '.password');
+        $user = $config->get($schema . '.user');
+        $password = $config->get($schema . '.password');
 
         self::$_servers[$schema] = array();
 

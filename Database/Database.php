@@ -78,7 +78,7 @@ class Database
     public function getDefaultSchema()
     {
         $ext = App::getInstance()->extension('Database');
-        $schema = $ext->getConfig()->get('db.default_schema') ?: $ext->getSetting(self::DEFAULT_SCHEMA);
+        $schema = $ext->getConfig()->get('default_schema') ?: $ext->getSetting(self::DEFAULT_SCHEMA);
         return $schema;
     }
 

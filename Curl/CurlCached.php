@@ -30,6 +30,12 @@ class CurlCached extends Curl
      */
     public function __construct($url, $cache_key, $ttl = 7200)
     {
+        $app = App::getInstance();
+
+        if (!$app->extensionLoaded('Cache')) {
+            throw new Exception('CurlCached depends on the Cache extension.  It is not currently loaded.');
+        }
+
         parent::__construct($url);
         $this->_cache_key = $cache_key;
         $this->_ttl = Util::toSeconds($ttl);

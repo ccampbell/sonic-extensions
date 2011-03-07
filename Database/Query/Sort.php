@@ -35,21 +35,29 @@ class Sort
     /**
      * @var array
      */
-    protected $_preserve_data = array();
+    protected $_preserve_data = true;
 
     /**
      * adds a sort to process
      *
      * @param string $column
      * @param string $direction (self::ASC || self::DESC)
-     * @param bool $preserve_data
      * @return void
      */
-    public function add($column, $direction, $preserve_data = false)
+    public function add($column, $direction)
     {
         $this->_columns[] = $column;
         $this->_directions[] = $direction;
-        $this->_preserve_data[] = $preserve_data;
+    }
+
+    /**
+     * tells the sort that we can scrap the data when we are done
+     *
+     * @return void
+     */
+    public function scrapData()
+    {
+        $this->_preserve_data = false;
     }
 
     /**
@@ -61,30 +69,33 @@ class Sort
      * @param bool $preserve_data should we return just ids or the full data set?
      * @return array
      */
-    protected function _process($rows, $column, $direction, $preserve_data)
+    protected function _process($rows, $column, $direction)
     {
         $map = $all_data = array();
-        foreach ($rows as $row) {
+        foreach ($rows as $key => $row) {
             if (!is_array($row)) {
                 $map[$row] = $row;
                 continue;
             }
 
-            if ($preserve_data) {
-                $all_data['id:' . $row['id']] = $row;
-                $map['id:' . $row['id']] = $row[$column];
+            // if you want to sort without selecting id
+            $id = isset($row['id']) ? $row['id'] : $key;
+
+            if ($this->_preserve_data) {
+                $all_data['id:' . $id] = $row;
+                $map['id:' . $id] = $row[$column];
                 continue;
             }
-            $map[$row['id']] = $row[$column];
+            $map[$id] = $row[$column];
         }
 
-        natsort($map);
+        natcasesort($map);
 
         if ($direction == self::DESC) {
             $map = array_reverse($map, true);
         }
 
-        if ($preserve_data) {
+        if ($this->_preserve_data) {
             $all_data = array_merge($map, $all_data);
             return array_values($all_data);
         }
@@ -106,7 +117,7 @@ class Sort
 
         // optimization if a single sort is present
         if (count($this->_columns) == 1) {
-            return $this->_process($rows, $this->_columns[0], $this->_directions[0], $this->_preserve_data[0]);
+            return $this->_process($rows, $this->_columns[0], $this->_directions[0]);
         }
 
         // multiple sorts

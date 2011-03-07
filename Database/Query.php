@@ -234,6 +234,10 @@ class Query
      */
     public function fetchIds()
     {
+        if ($this->_sort) {
+            $this->_sort->scrapData();
+        }
+
         $all_data = $this->fetchAll();
 
         // no data to begin with
@@ -323,15 +327,14 @@ class Query
      *
      * @param string $column
      * @param string $direction
-     * @param bool $preserve_data
      * @return Query
      */
-    public function sort($column, $direction, $preserve_data = false)
+    public function sort($column, $direction)
     {
         if ($this->_sort === null) {
             $this->_sort = new Query\Sort();
         }
-        $this->_sort->add($column, $direction, $preserve_data);
+        $this->_sort->add($column, $direction);
         return $this;
     }
 

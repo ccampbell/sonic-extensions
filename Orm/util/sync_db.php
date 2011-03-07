@@ -6,7 +6,7 @@
  * @author Craig Campbell
  */
 use \Sonic\App;
-use \Sonic\Database\Sync;
+use \Sonic\Database\Sync, \Sonic\Database;
 $lib_path = str_replace('/util/sync_db.php', '/libs', realpath(__FILE__));
 
 set_include_path($lib_path);
@@ -27,18 +27,19 @@ include 'Sonic/App.php';
 $app = App::getInstance();
 $app->addSetting(App::AUTOLOAD, true);
 
-// if we would prefer mysql_query over pdo
-if (in_array('--mysql', $_SERVER['argv'])) {
-    $app->addSetting(App::DB_DRIVER, App::MYSQL);
-}
-
-if (in_array('--mysqli', $_SERVER['argv'])) {
-    $app->addSetting(App::DB_DRIVER, APP::MYSQLI);
-}
-
 $app->start(App::COMMAND_LINE, true);
 $app->loadExtension('Orm');
 $app->loadExtension('Cache');
+$app->loadExtension('Database');
+
+// if we would prefer mysql_query over pdo
+if (in_array('--mysql', $_SERVER['argv'])) {
+    $app->extension('Database')->addSetting(Database::DRIVER, Database::MYSQL);
+}
+
+if (in_array('--mysqli', $_SERVER['argv'])) {
+    $app->extension('Database')->addSetting(Database::DRIVER, Database::MYSQLI);
+}
 
 // dry run - outputs sql but doesn't run it
 if (in_array('--dry-run', $_SERVER['argv'])) {

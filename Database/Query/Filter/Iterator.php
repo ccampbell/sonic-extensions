@@ -29,8 +29,14 @@ class Iterator
     public function process($rows, $total_weight = null)
     {
         $filtered_data = array();
+        $single_column = count($rows) && !is_array($rows[0]);
         foreach ($rows as $row) {
             foreach ($this->_patterns as $pattern) {
+
+                // full text search won't work with a single column
+                if ($pattern['comparison'] == 'FULLTEXT' && $single_column) {
+                    throw new \Sonic\Database\Exception('you cannot filter by fulltext when selecting a single column');
+                }
 
                 // for fulltext search let's update the row to add relevancy scores
                 if ($pattern['comparison'] == 'FULLTEXT') {
@@ -38,7 +44,7 @@ class Iterator
                     continue;
                 }
 
-                $value = $row[$pattern['column']];
+                $value = $single_column ? $row : $row[$pattern['column']];
                 if (!$this->matches($value, $pattern)) {
                     continue 2;
                 }

@@ -99,7 +99,7 @@ function namespacesFromFiles($files, &$use = array())
         preg_match('/namespace\s(.*);/', $contents, $matches);
 
         $namespace = isset($matches[1]) ? $matches[1] : 'none';
-        preg_match_all('/use (.*?);/', $contents, $matches);
+        preg_match_all('/use ([a-zA-Z,\s_\\\]+?);/', $contents, $matches);
 
         if (!isset($use[$namespace])) {
             $use[$namespace] = array();
@@ -173,7 +173,7 @@ function updateFile($contents, $minimize = true)
 {
     $contents = str_replace('<?php' . "\n", '', $contents);
     $contents = preg_replace('/namespace(.*?);/', '', $contents);
-    $contents = preg_replace('/use(.*?);/', '', $contents);
+    $contents = preg_replace('/use ([a-zA-Z,\s_\\\]+?);/', '', $contents);
 
     $contents = str_replace(' =', '=', $contents);
     $contents = str_replace('= ', '=', $contents);

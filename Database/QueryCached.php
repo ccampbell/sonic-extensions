@@ -126,6 +126,10 @@ class QueryCached extends Query
      */
     public function fetchRow()
     {
+        if ($this->_filter !== null || $this->_sort !== null) {
+            return parent::fetchRow();
+        }
+
         if (!$this->wasInCache()) {
             $this->_cache(parent::fetchRow());
         }

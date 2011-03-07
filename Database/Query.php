@@ -177,6 +177,12 @@ class Query
      */
     public function fetchRow()
     {
+        // if a sort or filter has been applied
+        if ($this->_filter !== null || $this->_sort !== null) {
+            $rows = $this->fetchAll();
+            return count($rows) == 0 ? false : $rows[0];
+        }
+
         if (!$this->_executed)
             $this->execute();
 

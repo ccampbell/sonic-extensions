@@ -1,5 +1,6 @@
 <?php
 namespace Sonic;
+use Sonic\App;
 
 /**
  * Session
@@ -123,6 +124,7 @@ class Session
     public function setLifetime($lifetime)
     {
         $this->_lifetime = $lifetime;
+        App::getInstance()->includeFile('Sonic/Util.php');
         return ini_set('session.gc_maxlifetime', Util::toSeconds($lifetime));
     }
 
@@ -140,6 +142,7 @@ class Session
     public function setCookieParams($lifetime = 0, $path = '/', $domain = '', $secure = false, $http_only = false)
     {
         $this->_lifetime = $lifetime;
+        App::getInstance()->includeFile('Sonic/Util.php');
         $lifetime = Util::toSeconds($lifetime);
         session_set_cookie_params($lifetime, $path, $domain, $secure, $http_only);
     }
@@ -216,6 +219,7 @@ class Session
      */
     protected function _setCookie($expiration)
     {
+        App::getInstance()->includeFile('Sonic/Util.php');
         $expiration = Util::toSeconds($expiration);
         $params = session_get_cookie_params();
         setcookie(

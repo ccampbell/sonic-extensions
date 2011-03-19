@@ -32,7 +32,7 @@ class File
         }
 
         \Sonic\App::getInstance()->includeFile('Sonic/Util.php');
-        $this->_dir = rtrim($dir, '/');
+        $this->_dir = rtrim($dir, DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -115,6 +115,6 @@ class File
      */
     protected function _pathForKey($key)
     {
-       return $this->_dir . '/' . $key . '.txt';
+       return $this->_dir . DIRECTORY_SEPARATOR . $key . '.txt';
     }
 }

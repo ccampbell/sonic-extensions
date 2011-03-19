@@ -7,9 +7,6 @@
  */
 use \Sonic\App;
 use \Sonic\Database\Sync, \Sonic\Database;
-$lib_path = str_replace('/util/sync_db.php', '/libs', realpath(__FILE__));
-
-set_include_path($lib_path);
 
 if (in_array('-h', $_SERVER['argv']) || in_array('--help', $_SERVER['argv'])) {
     echo "./util/sync_db.php","\n\n";
@@ -23,11 +20,14 @@ if (in_array('-h', $_SERVER['argv']) || in_array('--help', $_SERVER['argv'])) {
     exit;
 }
 
-include 'Sonic/App.php';
-$app = App::getInstance();
-$app->addSetting(App::AUTOLOAD, true);
+$base_path = str_replace(DIRECTORY_SEPARATOR . 'util', '', __DIR__);
+include $base_path . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'Sonic' . DIRECTORY_SEPARATOR . 'App.php';
 
-$app->start(App::COMMAND_LINE, true);
+$app = App::getInstance();
+$app->setBasePath($base_path);
+$app->addSetting(App::AUTOLOAD, true);
+$app->start(App::COMMAND_LINE);
+
 $app->loadExtension('Orm');
 $app->loadExtension('Cache');
 $app->loadExtension('Database');

@@ -373,7 +373,7 @@ class Dao
 
         $query = new Query($sql);
 
-        Sync::output('deleting column "' . $column_name . '" from table "' . $table . '"');
+        Sync::output('removing column "' . $column_name . '" from table "' . $table . '"');
 
         return Sync::execute($query);
     }

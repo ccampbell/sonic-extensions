@@ -10,7 +10,7 @@ namespace Sonic\Extension;
  */
 class Orm extends Manifest
 {
-    const VERSION = "1.0.1";
+    const VERSION = "1.0.2";
     protected $_dependencies = array('Database', 'Cache');
     protected $_instructions = "Check out http://sonicframework.com/tutorial/orm for help getting started";
 }

@@ -7,15 +7,15 @@
  */
 use \Sonic\App;
 use \Sonic\Object\DefinitionFactory;
-$lib_path = str_replace('/util/skeleton_class.php', '/libs', realpath(__FILE__));
 
-set_include_path($lib_path);
+$base_path = str_replace(DIRECTORY_SEPARATOR . 'util', '', __DIR__);
+include $base_path . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'Sonic' . DIRECTORY_SEPARATOR . 'App.php';
 
-include 'Sonic/App.php';
 $app = App::getInstance();
+$app->setBasePath($base_path);
 $app->addSetting(App::AUTOLOAD, true);
 $app->start(App::COMMAND_LINE);
-$app->loadExtension('Orm');
+$app->loadExtension('Orm')->loadExtension('Database');
 
 if (!isset($_SERVER['argv'][1])) {
     echo 'need to pass in a table or class as an argument!' . "\n";

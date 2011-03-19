@@ -27,7 +27,7 @@ class DefinitionFactory
             return self::$_definitions;
         }
         $path = App::getInstance()->getPath('configs');
-        include $path . '/definitions.php';
+        include $path . DIRECTORY_SEPARATOR . 'definitions.php';
         self::$_definitions = $definitions;
 
         return self::$_definitions;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2010 Craig Campbell
+ * Copyright 2011 Craig Campbell
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class ChromePhp
     /**
      * @var string
      */
-    const VERSION = '2.2.2';
+    const VERSION = '2.2.3';
 
     /**
      * @var string
@@ -77,6 +77,11 @@ class ChromePhp
      * @var string
      */
     const GROUP = 'group';
+
+    /**
+     * @var string
+     */
+    const INFO = 'info';
 
     /**
      * @var string
@@ -137,6 +142,13 @@ class ChromePhp
      * @var ChromePhp
      */
     protected static $_instance;
+
+    /**
+     * Prevent recursion when working with objects referring to each other
+     *
+     * @var array
+     */
+    protected $_processed = array();
 
     /**
      * constructor
@@ -218,6 +230,16 @@ class ChromePhp
     }
 
     /**
+     * sends an info log
+     *
+     * @param string value
+     */
+    public static function info()
+    {
+        return self::_log(func_get_args() + array('type' => self::INFO));
+    }
+
+    /**
      * sends a collapsed group log
      *
      * @param string value
@@ -269,6 +291,7 @@ class ChromePhp
             $value = $args[1];
         }
 
+        $logger->_processed = array();
         $value = $logger->_convert($value);
 
         $backtrace = debug_backtrace(false);
@@ -295,6 +318,10 @@ class ChromePhp
             return $object;
         }
 
+        //Mark this object as processed so we don't convert it twice and it
+        //Also avoid recursion when objects refer to each other
+        $this->_processed[] = $object;
+
         $object_as_array = array();
 
         // first add the class name
@@ -305,8 +332,8 @@ class ChromePhp
         foreach ($object_vars as $key => $value) {
 
             // same instance as parent object
-            if ($value === $object) {
-                $value = 'recursion - parent object';
+            if ($value === $object || in_array($value, $this->_processed, true)) {
+                $value = 'recursion - parent object [' . get_class($value) . ']';
             }
             $object_as_array[$key] = $this->_convert($value);
         }
@@ -333,8 +360,8 @@ class ChromePhp
             }
 
             // same instance as parent object
-            if ($value === $object) {
-                $value = 'recursion - parent object';
+            if ($value === $object || in_array($value, $this->_processed, true)) {
+                $value = 'recursion - parent object [' . get_class($value) . ']';
             }
 
             $object_as_array[$type] = $this->_convert($value);
@@ -503,6 +530,19 @@ class ChromePhp
     public function addSetting($key, $value)
     {
         $this->_settings[$key] = $value;
+    }
+
+    /**
+     * add ability to set multiple settings in one call
+     *
+     * @param array $settings
+     * @return void
+     */
+    public function addSettings(array $settings)
+    {
+        foreach ($settings as $key => $value) {
+            $this->addSetting($key, $value);
+        }
     }
 
     /**

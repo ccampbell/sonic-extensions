@@ -42,6 +42,11 @@ class Console
     const WARN = 'warn';
 
     /**
+     * @var string
+     */
+    const INFO = 'info';
+
+    /**
      * @var bool
      */
     protected static $_use = false;
@@ -133,5 +138,17 @@ class Console
     public static function error($key, $value = null)
     {
         return self::_log($key, $value, self::ERROR);
+    }
+
+    /**
+     * info
+     *
+     * @param mixed $key
+     * @param mixed $value
+     * @return void
+     */
+    public static function info($key, $value = null)
+    {
+        return self::_log($key, $value, self::INFO);
     }
 }

@@ -341,6 +341,9 @@ abstract class Object
      */
     protected static function _getSingle($column, $value)
     {
+        $initial_column = $column;
+        $initial_value = $value;
+
         $class = get_called_class();
         $definition = self::getDefinition($class);
 
@@ -381,6 +384,11 @@ abstract class Object
             return null;
         }
 
+        // fix bug where old items are not removed from cache if the value of the column changes
+        if ($object->$initial_column != $initial_value) {
+            return null;
+        }
+
         return $object;
     }
 
@@ -417,7 +425,7 @@ abstract class Object
         if (!$this->_propertyExists($original_field)) {
             $value = $json_key;
             $json_key = $db_field;
-            $db_field = 'data';
+            $db_field = 'json';
         }
 
         if (!$this->_propertyExists($db_field) || ($original_field != $db_field && $original_value !== self::JSON_GET)) {

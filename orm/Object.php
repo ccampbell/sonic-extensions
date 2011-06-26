@@ -19,6 +19,16 @@ abstract class Object
     const MURDERED = 345181800;
 
     /**
+     * no one should ever set a value to this, so we can use this as the default
+     * to determine if we are getting or setting json data
+     *
+     * this allows us to set a json value to be null
+     *
+     * @var string
+     */
+    const JSON_GET = 'e95db0e3385602fe9234699238a2a47b';
+
+    /**
      * @var int
      */
     protected $id;
@@ -37,6 +47,11 @@ abstract class Object
      * @var array
      */
     protected $_cache_times = array();
+
+    /**
+     * @var array
+     */
+    protected $_json = array();
 
     /**
      * @var array
@@ -370,6 +385,62 @@ abstract class Object
     }
 
     /**
+     * gets an array representation of this json field
+     *
+     * @param string $db_field
+     * @return array
+     */
+    protected function _getArrayFromJson($db_field)
+    {
+        if (isset($this->_json[$db_field])) {
+            return $this->_json[$db_field];
+        }
+
+        $this->_json[$db_field] = json_decode($this->$db_field, true) ?: array();
+        return $this->_json[$db_field];
+    }
+
+    /**
+     * gets or sets json data
+     *
+     * @param string $db_field
+     * @param string $json_key
+     * @param mixed $value
+     * @return mixed
+     */
+    public function json($db_field, $json_key = self::JSON_GET, $value = self::JSON_GET)
+    {
+        $original_field = $db_field;
+        $original_value = $value;
+
+        // default to try to pull out of data field
+        if (!$this->_propertyExists($original_field)) {
+            $value = $json_key;
+            $json_key = $db_field;
+            $db_field = 'data';
+        }
+
+        if (!$this->_propertyExists($db_field) || ($original_field != $db_field && $original_value !== self::JSON_GET)) {
+            throw new Object\Exception('trying to get or set json value for field which does not exist: ' . $original_field);
+        }
+
+        $data = $this->_getArrayFromJson($db_field);
+        if ($value !== self::JSON_GET) {
+            $data[$json_key] = $value;
+            $this->_json[$db_field] = $data;
+            $this->_updates[$db_field] = $db_field;
+        }
+
+        // delete null fields
+        if ($value === null) {
+            unset($data[$json_key]);
+            $this->_json[$db_field] = $data;
+        }
+
+        return isset($data[$json_key]) ? $data[$json_key] : null;
+    }
+
+    /**
      * saves or updates an object
      *
      * @return void
@@ -385,6 +456,12 @@ abstract class Object
         // set default values
         foreach ($definition['columns'] as $property => $column) {
 
+            // if this property is a json field
+            if (isset($this->_updates[$property]) && isset($this->_json[$property])) {
+                $this->$property = json_encode($this->_json[$property]);
+                continue;
+            }
+
             // if this column is set to NOW we need to put the date in for cache
             if ($this->$property === 'NOW()') {
                 $this->$property = date('Y-m-d H:i:s');
@@ -397,7 +474,7 @@ abstract class Object
             }
 
             // property already set
-            if (in_array($property, $this->_updates)) {
+            if (isset($this->_updates[$property])) {
                 continue;
             }
 
@@ -407,7 +484,7 @@ abstract class Object
         }
 
         // this is a new object
-        if (!$this->id || in_array('id', $this->_updates)) {
+        if (!$this->id || isset($this->_updates['id'])) {
             $this->_add();
             $this->reset();
             $this->_cache();
@@ -456,7 +533,7 @@ abstract class Object
      */
     protected function _update()
     {
-        if (in_array('id', $this->_updates)) {
+        if (isset($this->_updates['id'])) {
             throw new Object\Exception('you cannot update an id after you create an object');
         }
 

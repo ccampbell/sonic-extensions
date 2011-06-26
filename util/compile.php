@@ -64,7 +64,7 @@ function processDir($dir, $first = false)
 
         // do not include anything in libs directory since chances are it will
         // be a ton of files
-        if ($first && $file->isDir() && in_array($file->getFilename(), array('libs', 'util'))) {
+        if ($first && $file->isDir() && in_array($file->getFilename(), array('libs', 'util', 'configs'))) {
             output('skipping ' .  $file->getFilename() . ' directory', true);
             continue;
         }

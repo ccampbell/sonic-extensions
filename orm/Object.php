@@ -19,16 +19,6 @@ abstract class Object
     const MURDERED = 345181800;
 
     /**
-     * no one should ever set a value to this, so we can use this as the default
-     * to determine if we are getting or setting json data
-     *
-     * this allows us to set a json value to be null
-     *
-     * @var string
-     */
-    const JSON_GET = 'e95db0e3385602fe9234699238a2a47b';
-
-    /**
      * @var int
      */
     protected $id;
@@ -416,31 +406,32 @@ abstract class Object
      * @param mixed $value
      * @return mixed
      */
-    public function json($db_field, $json_key = self::JSON_GET, $value = self::JSON_GET)
+    public function json($db_field, $json_key = null, $value = null)
     {
-        $original_field = $db_field;
-        $original_value = $value;
-
+        $args = func_get_args();
+        $is_set = count($args) == 3;
+        
         // default to try to pull out of data field
-        if (!$this->_propertyExists($original_field)) {
+        if (!$this->_propertyExists($db_field)) {
             $value = $json_key;
             $json_key = $db_field;
             $db_field = 'json';
+            $is_set = count($args) == 2;
         }
-
-        if (!$this->_propertyExists($db_field) || ($original_field != $db_field && $original_value !== self::JSON_GET)) {
-            throw new Object\Exception('trying to get or set json value for field which does not exist: ' . $original_field);
+        
+        if (!$this->_propertyExists($db_field) || count($args) == 3) {
+            throw new Object\Exception('trying to get or set json value for field which does not exist: ' . $args[0]);
         }
 
         $data = $this->_getArrayFromJson($db_field);
-        if ($value !== self::JSON_GET) {
+        if ($is_set) {
             $data[$json_key] = $value;
             $this->_json[$db_field] = $data;
             $this->_updates[$db_field] = $db_field;
         }
 
         // delete null fields
-        if ($value === null) {
+        if ($is_set && $value === null) {
             unset($data[$json_key]);
             $this->_json[$db_field] = $data;
         }

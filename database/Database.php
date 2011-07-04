@@ -13,6 +13,7 @@ class Database
 {
     const INT = 'int';
     const TINY_INT = 'tinyint';
+    const BIG_INT = 'bigint';
     const VARCHAR = 'varchar';
     const ENUM = 'enum';
     const DATETIME = 'datetime';

@@ -306,7 +306,7 @@ class Sync
      */
     public static function isInteger($column)
     {
-        return in_array($column['type'], array(Database::INT, Database::TINY_INT));
+        return in_array($column['type'], array(Database::INT, Database::TINY_INT, Database::BIG_INT));
     }
 
     /**

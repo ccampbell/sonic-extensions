@@ -369,6 +369,10 @@ abstract class Object
             return null;
         }
 
+        if (!$object instanceof Object && $object == self::MURDERED) {
+            return null;
+        }
+
         // if this is a soft deleted object then don't return it
         if (isset($definition['columns']['is_deleted']) && $object->is_deleted == 1) {
             return null;
@@ -410,7 +414,7 @@ abstract class Object
     {
         $args = func_get_args();
         $is_set = count($args) == 3;
-        
+
         // default to try to pull out of data field
         if (!$this->_propertyExists($db_field)) {
             $value = $json_key;
@@ -418,7 +422,7 @@ abstract class Object
             $db_field = 'json';
             $is_set = count($args) == 2;
         }
-        
+
         if (!$this->_propertyExists($db_field) || count($args) == 3) {
             throw new Object\Exception('trying to get or set json value for field which does not exist: ' . $args[0]);
         }

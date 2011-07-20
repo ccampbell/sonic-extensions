@@ -454,6 +454,7 @@ abstract class Object
             return;
         }
 
+        $new_object = !$this->id || isset($this->_updates['id']);
         $definition = $this->getDefinition();
 
         // set default values
@@ -471,6 +472,11 @@ abstract class Object
                 continue;
             }
 
+            // if this object already exists
+            if (!$new_object) {
+                continue;
+            }
+
             // no default
             if (!isset($column['default'])) {
                 continue;
@@ -481,13 +487,13 @@ abstract class Object
                 continue;
             }
 
-            if (!$this->$property) {
+            if ($this->$property === null) {
                 $this->$property = $column['default'];
             }
         }
 
         // this is a new object
-        if (!$this->id || isset($this->_updates['id'])) {
+        if ($new_object) {
             $this->_add();
             $this->reset();
             $this->_cache();

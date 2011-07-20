@@ -116,4 +116,14 @@ class Collection extends ArrayObject
     {
         return $this->_pager;
     }
+
+    /**
+     * gets the ids passed into this collection
+     *
+     * @return array
+     */
+    public function getIds()
+    {
+        return $this->_ids;
+    }
 }

@@ -69,8 +69,6 @@ class Console
 
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false) {
             self::$_use = self::CHROMEPHP;
-            $dir_path = App::getInstance()->getPath('public_html') . '/chrome_logs';
-            ChromePhp::useFile($dir_path, '/chrome_logs');
             ChromePhp::getInstance()->addSetting(ChromePhp::BACKTRACE_LEVEL, 2);
             return;
         }

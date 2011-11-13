@@ -2,7 +2,7 @@
 namespace Sonic;
 use Sonic\Database\Query;
 use Sonic\Database\QueryCached;
-use Sonic\App;
+use Sonic\Cache;
 
 /**
  * Object
@@ -13,6 +13,8 @@ use Sonic\App;
  */
 abstract class Object
 {
+    const SETTING_CACHE_POOL = 1;
+
     /**
      * @var int
      */
@@ -256,7 +258,7 @@ abstract class Object
             $cache_key_to_id[$cache_key] = $id;
         }
 
-        $cache = App::getMemcache();
+        $cache = self::_getCache();
 
         // do a multiget request for these cache keys
         $objects = $cache->getMulti($cache_keys);
@@ -529,7 +531,7 @@ abstract class Object
 
         // go through all the unique properties and link them in cache to this id
         foreach ($this->getUniqueProperties() as $property) {
-            App::getMemcache()->set(self::_getCacheKey($property, $this->$property), $this->id, '1 week');
+            self::_getCache()->set(self::_getCacheKey($property, $this->$property), $this->id, '1 week');
         }
 
         return true;
@@ -565,7 +567,7 @@ abstract class Object
 
         foreach ($this->_updates as $update) {
             if (in_array($update, $this->getUniqueProperties())) {
-                App::getMemcache()->set(self::_getCacheKey($update, $this->$update), $this->id, '1 week');
+                self::_getCache()->set(self::_getCacheKey($update, $this->$update), $this->id, '1 week');
             }
         }
 
@@ -591,7 +593,7 @@ abstract class Object
 
         if ($result) {
             $cache_key = $this->_getCacheKey('id', $this->id);
-            App::getMemcache()->set($cache_key, self::MURDERED, '1 week');
+            self::_getCache()->set($cache_key, self::MURDERED, '1 week');
         }
 
         return $result;
@@ -628,6 +630,27 @@ abstract class Object
     }
 
     /**
+     * gets cache pool to store ORM objects in
+     *
+     * @return string
+     */
+    protected static function _getCachePool()
+    {
+        $pool = \Sonic\App::getInstance()->extension('ORM')->getSetting(self::SETTING_CACHE_POOL);
+        return $pool ?: Cache::DEFAULT_CACHE_POOL;
+    }
+
+    /**
+     * gets object cache
+     *
+     * @return string
+     */
+    protected static function _getCache()
+    {
+        return Cache::getCache(self::_getCachePool());
+    }
+
+    /**
      * puts this object into cache
      *
      * @return void
@@ -635,6 +658,6 @@ abstract class Object
     protected function _cache()
     {
         $cache_key = self::_getCacheKey('id', $this->id);
-        App::getMemcache()->set($cache_key, $this, '1 week');
+        self::_getCache(self::_getCachePool())->set($cache_key, $this, '1 week');
     }
 }

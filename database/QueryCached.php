@@ -2,6 +2,7 @@
 namespace Sonic\Database;
 use Sonic\Util;
 use Sonic\App;
+use Sonic\Cache;
 
 /**
  * QueryCached Class
@@ -81,7 +82,7 @@ class QueryCached extends Query
             return $this->_in_cache;
         }
 
-        $cache = App::getMemcache($this->_cache_pool);
+        $cache = Cache::getCache($this->_cache_pool);
         $data = $cache->get($this->_cache_key);
 
         if ($data === false) {
@@ -102,7 +103,7 @@ class QueryCached extends Query
      */
     protected function _cache($data)
     {
-        App::getMemcache($this->_cache_pool)->set($this->_cache_key, $data, $this->_cache_time);
+        Cache::getCache($this->_cache_pool)->set($this->_cache_key, $data, $this->_cache_time);
         $this->_cached_value = $data;
     }
 

@@ -3,21 +3,21 @@ namespace Sonic\Cache;
 use Sonic\Util;
 
 /**
- * Memcache
+ * Memcached
  *
  * @category Sonic
  * @package Cache
  * @author Craig Campbell
  */
-class Memcache
+class Memcached
 {
     /**
-     * @var Memcache
+     * @var Memcached
      */
-    protected $_memcache;
+    protected $_memcached;
 
     /**
-     * constructs a new Memcache class
+     * constructs a new Memcached class
      *
      * pass in an array formatted like this:
      *
@@ -26,12 +26,13 @@ class Memcache
      *     1 => array('host' => '127.0.0.1', 'port' => '11311')
      * )
      *
-     * @param array
+     * @param array $servers
+     * @param string $pool
      * @return void
      */
-    public function __construct(array $servers)
+    public function __construct(array $servers, $pool = null)
     {
-        $this->_memcache = new \Memcache();
+        $this->_memcached = new \Memcached($pool);
         foreach ($servers as $server) {
             $this->_addServer($server['host'], $server['port']);
         }
@@ -46,7 +47,7 @@ class Memcache
     protected function _addServer($host, $port)
     {
         try {
-            $this->_memcache->addServer($host, $port);
+            $this->_memcached->addServer($host, $port);
         } catch (\Exception $e) {
 
         }
@@ -63,7 +64,7 @@ class Memcache
     public function set($key, $value, $ttl = 7200)
     {
         $ttl = Util::toSeconds($ttl);
-        return $this->_memcache->set($key, $value, 0, $ttl);
+        return $this->_memcached->set($key, $value, $ttl);
     }
 
     /**
@@ -74,7 +75,17 @@ class Memcache
      */
     public function get($key)
     {
-        return $this->_memcache->get($key);
+        return $this->_memcached->get($key);
+    }
+
+    /**
+     * determines if the last requested key was found in cache
+     *
+     * @return bool
+     */
+    public function wasFound()
+    {
+        return $this->_memcached->getResultCode() != \Memcached::RES_NOTFOUND;
     }
 
     /**
@@ -86,7 +97,7 @@ class Memcache
     public function getMulti(array $keys)
     {
         // grab whatever items we can from cache
-        $items = $this->get($keys);
+        $items = $this->_memcached->getMulti($keys) ?: array();
 
         // set all keys to null so if something is not found in cache it won't
         // be set to a value
@@ -105,16 +116,28 @@ class Memcache
      */
     public function delete($key)
     {
-        return $this->_memcache->delete($key);
+        return $this->_memcached->delete($key);
     }
 
     /**
-     * gets memcache object
+     * sets options
      *
-     * @return Memcache
+     * @param array $options
      */
-    public function getMemcache()
+    public function setOptions(array $options)
     {
-        return $this->_memcache;
+        foreach ($options as $key => $value) {
+            $this->_memcached->setOption($key, $value);
+        }
+    }
+
+    /**
+     * gets memcached object
+     *
+     * @return Memcached
+     */
+    public function getMemcached()
+    {
+        return $this->_memcached;
     }
 }

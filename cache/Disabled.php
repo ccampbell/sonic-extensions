@@ -51,4 +51,28 @@ class Disabled
      * @return void
      */
     public function getMemcache() {}
+
+    /**
+     * gets memcached object
+     *
+     * @return void
+     */
+    public function getMemcached() {}
+
+    /**
+     * sets options
+     *
+     * @return void
+     */
+    public function setOptions() {}
+
+    /**
+     * determines if the last requested key was found in cache
+     *
+     * @return bool
+     */
+    public function wasFound()
+    {
+        return false;
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 namespace Sonic;
-use Sonic\App;
+use Sonic\App, Sonic\Cache;
 
 /**
  * CurlCached
@@ -48,7 +48,7 @@ class CurlCached extends Curl
      */
     public function getResponse()
     {
-        $cache = App::getMemcache();
+        $cache = Cache::getCache();
         $result = $cache->get($this->_cache_key);
         if ($result !== false) {
             return $result;

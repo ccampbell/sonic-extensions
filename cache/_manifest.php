@@ -10,7 +10,7 @@ namespace Sonic\Extension;
  */
 class Cache extends Manifest
 {
-    const VERSION = "1.1";
+    const VERSION = "1.1.1";
     protected $_has_config = true;
     protected $_config_defaults = array(
         'enabled' => 1,

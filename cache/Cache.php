@@ -1,6 +1,6 @@
 <?php
 namespace Sonic;
-use Sonic\Cache\Memcache, Sonic\Cache\Memcached, Sonic\App;
+use Sonic\Cache\Memcache, Sonic\Cache\Memcached, Sonic\Cache\Disabled, Sonic\App;
 
 /**
  * Cache

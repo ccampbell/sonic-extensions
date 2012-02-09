@@ -241,6 +241,18 @@ abstract class Object
     }
 
     /**
+     * alias for self::get()
+     *
+     * @param mixed $id value to get
+     * @param string $column column to get that value from
+     * @return Object
+     */
+    public final static function load($key, $value = null)
+    {
+        return self::get($key, $value);
+    }
+
+    /**
      * gets multiple objects by ids
      *
      * @todo implement

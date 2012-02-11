@@ -638,7 +638,15 @@ abstract class Object
     protected final static function _getCacheKey($column, $value)
     {
         $definition = self::getDefinition();
-        return $definition['table'] . '_' . $column . ':' . $value;
+
+        $cache_key = $definition['table'] . '_' . $column . ':' . $value;
+
+        // append version to cache key if definition has one
+        if (isset($definition['version']) && $definition['version'] > 1) {
+            $cache_key .= ':' . $definition['version'];
+        }
+
+        return $cache_key;
     }
 
     /**

@@ -58,7 +58,6 @@ abstract class Object
      */
     public function __get($property)
     {
-        $this->_verifyProperty($property);
         return $this->$property;
     }
 

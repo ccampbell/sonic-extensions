@@ -43,7 +43,9 @@ class Database
     const WRITE = 'write';
 
     const DRIVER = 'driver';
+    const EMULATE_PREPARES = 'emulate_prepares';
     const DEFAULT_SCHEMA = 'default_schema';
+
     const PDO = 'pdo';
     const MYSQL = 'mysql';
     const MYSQLI = 'mysqli';
@@ -108,14 +110,20 @@ class Database
             return $this->_connections[$type];
         }
 
-        $server = $this->getRandomServer($type);
+         $app = App::getInstance();
+         $emulate_prepares = $app->extension('Database')->getSetting(self::EMULATE_PREPARES);
 
+         if ($emulate_prepares === null) {
+             $emulate_prepares = true;
+         }
+
+        $server = $this->getRandomServer($type);
         $class = self::getDriverClass();
 
         $pdo = new $class($server['dsn'], $server['user'], $server['password']);
         $pdo->setAttribute($class::ATTR_ERRMODE, $class::ERRMODE_EXCEPTION);
         $pdo->setAttribute($class::ATTR_CASE, $class::CASE_LOWER);
-        $pdo->setAttribute($class::ATTR_EMULATE_PREPARES, true);
+        $pdo->setAttribute($class::ATTR_EMULATE_PREPARES, $emulate_prepares);
 
         $this->_connections[$type] = $pdo;
         return $this->_connections[$type];

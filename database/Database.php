@@ -110,12 +110,12 @@ class Database
             return $this->_connections[$type];
         }
 
-         $app = App::getInstance();
-         $emulate_prepares = $app->extension('Database')->getSetting(self::EMULATE_PREPARES);
+        $app = App::getInstance();
+        $emulate_prepares = $app->extension('Database')->getSetting(self::EMULATE_PREPARES);
 
-         if ($emulate_prepares === null) {
-             $emulate_prepares = true;
-         }
+        if ($emulate_prepares === null) {
+            $emulate_prepares = true;
+        }
 
         $server = $this->getRandomServer($type);
         $class = self::getDriverClass();
